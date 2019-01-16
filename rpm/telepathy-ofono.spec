@@ -55,7 +55,7 @@ cmake . \
     -DCMAKE_INSTALL_LIBEXECDIR=%{_libexecdir} \
     -DCMAKE_INSTALL_DATADIR=%{_datadir}
 
-make %{?jobs:-j%jobs}
+VERBOSE=1 V=1 make %{?jobs:-j%jobs}
 
 %install
 rm -rf %{buildroot}

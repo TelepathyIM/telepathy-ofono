@@ -105,3 +105,9 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/org.freedesktop.Telepathy.ConnectionM
 add_subdirectory(schema)
 add_subdirectory(tests)
 add_subdirectory(mc-plugin)
+
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()

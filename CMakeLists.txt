@@ -34,7 +34,6 @@ ENDIF(CMAKE_BUILD_TYPE MATCHES [cC][oO][vV][eE][rR][aA][gG][eE])
 
 find_package(LibPhoneNumber REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core DBus Network)
-add_definitions(-DQT_NO_KEYWORDS)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TP_QT5 REQUIRED TelepathyQt5)

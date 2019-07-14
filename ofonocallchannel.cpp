@@ -20,7 +20,7 @@
 
 
 oFonoCallChannel::oFonoCallChannel(oFonoConnection *conn, QString phoneNumber, uint targetHandle, QString voiceObj, QObject *parent):
-    OfonoVoiceCall(voiceObj),
+    QOfonoVoiceCall(parent),
     mIncoming(false),
     mRequestedHangup(false),
     mConnection(conn),
@@ -30,6 +30,8 @@ oFonoCallChannel::oFonoCallChannel(oFonoConnection *conn, QString phoneNumber, u
     mMultiparty(false)
     
 {
+    setVoiceCallPath(voiceObj);
+
     Tp::BaseChannelPtr baseChannel = Tp::BaseChannel::create(mConnection, TP_QT_IFACE_CHANNEL_TYPE_CALL, Tp::HandleTypeContact, targetHandle);
     Tp::BaseChannelCallTypePtr callType = Tp::BaseChannelCallType::create(baseChannel.data(),
                                                                           true,
@@ -70,7 +72,7 @@ Tp::CallState oFonoCallChannel::callState()
 
 void oFonoCallChannel::onSplit(Tp::DBusError *error)
 {
-    mConnection->voiceCallManager()->privateChat(path());
+    mConnection->voiceCallManager()->privateChat(voiceCallPath());
 }
 
 void oFonoCallChannel::onHangupComplete(bool status)
@@ -193,7 +195,7 @@ void oFonoCallChannel::onHoldStateChanged(const Tp::LocalHoldState &state, const
 
 void oFonoCallChannel::onSwapCallsComplete(bool success)
 {
-    if (!success && errorName() == "org.ofono.Error.InProgress") {
+    if (!success /*&& errorName() == "org.ofono.Error.InProgress"   TODO: PORTING */) {
         QTimer::singleShot(2000, mConnection->voiceCallManager(), &OfonoVoiceCallManager::swapCalls);
         return;
     }

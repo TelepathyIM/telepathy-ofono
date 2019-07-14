@@ -26,8 +26,6 @@
 #include <TelepathyQt/BaseCall>
 #include <TelepathyQt/Types>
 
-#include <ofonovoicecall.h>
-
 #include "connection.h"
 
 class oFonoConnection;

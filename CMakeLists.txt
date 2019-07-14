@@ -41,6 +41,7 @@ pkg_check_modules(TP_QT5 REQUIRED TelepathyQt5)
 pkg_check_modules(SQLITE3 REQUIRED sqlite3)
 pkg_check_modules(MC_PLUGINS REQUIRED mission-control-plugins)
 pkg_check_modules(OFONO_QT REQUIRED ofono-qt)
+pkg_check_modules(QOFONO REQUIRED qofono-qt5)
 
 find_program(DBUS_RUNNER dbus-test-runner)
 
@@ -51,6 +52,7 @@ include_directories(${SQLITE3_INCLUDE_DIRS})
 include_directories(${LibPhoneNumber_INCLUDE_DIRS})
 include_directories(/usr/include/telepathy-qt5/)
 include_directories(${OFONO_QT_INCLUDE_DIRS})
+include_directories(${QOFONO_INCLUDE_DIRS})
 
 find_library(TELEPATHY_QT5_LIBRARIES telepathy-qt5)
 find_library(TELEPATHY_QT5_SERVICE_LIBRARIES telepathy-qt5-service)
@@ -93,7 +95,7 @@ add_dependencies(${TELEPATHY_OFONO} schema_update qrc_update)
 
 enable_testing()
 
-target_link_libraries(${TELEPATHY_OFONO} Qt5::Core Qt5::DBus -ltelepathy-qt5 ${TELEPATHY_QT5_SERVICE_LIBRARIES}  Qt5::Network ${OFONO_QT_LIBRARIES} ${SQLITE3_LIBRARIES} ${LibPhoneNumber_LIBRARIES})
+target_link_libraries(${TELEPATHY_OFONO} Qt5::Core Qt5::DBus -ltelepathy-qt5 ${TELEPATHY_QT5_SERVICE_LIBRARIES}  Qt5::Network ${OFONO_QT_LIBRARIES} ${SQLITE3_LIBRARIES} ${LibPhoneNumber_LIBRARIES} ${QOFONO_LIBRARIES})
 install(TARGETS ${TELEPATHY_OFONO} DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
 
 configure_file(ofono.service.in org.freedesktop.Telepathy.ConnectionManager.ofono.service)

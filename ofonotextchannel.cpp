@@ -17,8 +17,8 @@
  *          Gustavo Pichorim Boiko <gustavo.boiko@canonical.com>
  */
 
-// ofono-qt
-#include <ofonomessage.h>
+// qofono
+#include <qofonomessage.h>
 
 // telepathy-ofono
 #include "ofonotextchannel.h"
@@ -282,7 +282,8 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
             return objpath;
         }
-        OfonoMessage *msg = new OfonoMessage(objpath);
+        QOfonoMessage *msg = new QOfonoMessage(this);
+        msg->setMessagePath(objpath);
         if (msg->state() == "") {
             // message was already sent or failed too fast (this case is only reproducible with the emulator)
             msg->deleteLater();
@@ -292,7 +293,7 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
         }
         // FIXME: track pending messages only if delivery reports are enabled. We need a system config option for it.
         PendingMessagesManager::instance()->addPendingMessage(objpath, mPhoneNumbers[0]);
-        QObject::connect(msg, &OfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
+        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
         return objpath;
     } else {
         // Broadcast sms
@@ -320,7 +321,8 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
             return objpath;
         }
-        OfonoMessage *msg = new OfonoMessage(objpath);
+        QOfonoMessage *msg = new QOfonoMessage(this);
+        msg->setMessagePath(objpath);
         if (msg->state() == "") {
             // message was already sent or failed too fast (this case is only reproducible with the emulator)
             msg->deleteLater();
@@ -330,7 +332,7 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             // return only the last one in case of group chat for history purposes
             return objpath;
         }
-        QObject::connect(msg, &OfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
+        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
         return objpath;
     }
 }
@@ -430,7 +432,7 @@ void oFonoTextChannel::onProcessPendingDeliveryReport()
 
 void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
 {
-    OfonoMessage *msg = static_cast<OfonoMessage *>(sender());
+    QOfonoMessage *msg = static_cast<QOfonoMessage *>(sender());
     if(msg) {
         Tp::DeliveryStatus delivery_status;
         if (status == "sent") {
@@ -438,7 +440,7 @@ void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
             msg->deleteLater();
         } else if(status == "failed") {
             delivery_status = Tp::DeliveryStatusPermanentlyFailed;
-            PendingMessagesManager::instance()->removePendingMessage(msg->path());
+            PendingMessagesManager::instance()->removePendingMessage(msg->messagePath());
             msg->deleteLater();
         } else if(status == "pending") {
             delivery_status = Tp::DeliveryStatusTemporarilyFailed;
@@ -446,7 +448,7 @@ void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
             delivery_status = Tp::DeliveryStatusUnknown;
         }
 
-        sendDeliveryReport(msg->path(), mConnection->ensureHandle(mPhoneNumbers[0]), delivery_status);
+        sendDeliveryReport(msg->messagePath(), mConnection->ensureHandle(mPhoneNumbers[0]), delivery_status);
     }
 }
 

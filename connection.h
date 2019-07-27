@@ -30,6 +30,7 @@
 // qofono
 #include <qofonovoicecallmanager.h>
 #include <qofonocallvolume.h>
+#include <qofonomanager.h>
 #include <qofonomessagemanager.h>
 #include <qofonomessagewaiting.h>
 #include <qofonomodem.h>
@@ -38,8 +39,6 @@
 #include <qofonosimmanager.h>
 
 
-// ofono-qt
-#include <ofonomodemmanager.h>
 //  telepathy-ofono
 
 #include "ofonotextchannel.h"
@@ -155,7 +154,7 @@ private:
     QMap<QString, oFonoCallChannel*> mCallChannels;
 
     QStringList mModems;
-    OfonoModemManager *mOfonoModemManager;
+    QOfonoManager *mOfonoManager;
     QOfonoMessageManager *mOfonoMessageManager;
     QOfonoVoiceCallManager *mOfonoVoiceCallManager;
     QOfonoCallVolume *mOfonoCallVolume;

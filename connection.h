@@ -28,15 +28,13 @@
 #include <TelepathyQt/DBusError>
 
 // qofono
-#include <qofonomodem.h>
 #include <qofonovoicecallmanager.h>
+#include <qofonocallvolume.h>
 #include <qofonomessagemanager.h>
 #include <qofonomessagewaiting.h>
 
 // ofono-qt
 #include <ofonomodemmanager.h>
-#include <ofonovoicecall.h>
-#include <ofonocallvolume.h>
 #include <ofononetworkregistration.h>
 #include <ofonosupplementaryservices.h>
 #include <ofonosimmanager.h>
@@ -95,7 +93,7 @@ public:
 
     QOfonoMessageManager *messageManager();
     QOfonoVoiceCallManager *voiceCallManager();
-    OfonoCallVolume *callVolume();
+    QOfonoCallVolume *callVolume();
     QMap<QString, oFonoCallChannel*> callChannels();
 
     uint ensureHandle(const QString &phoneNumber);
@@ -159,7 +157,7 @@ private:
     OfonoModemManager *mOfonoModemManager;
     QOfonoMessageManager *mOfonoMessageManager;
     QOfonoVoiceCallManager *mOfonoVoiceCallManager;
-    OfonoCallVolume *mOfonoCallVolume;
+    QOfonoCallVolume *mOfonoCallVolume;
     OfonoNetworkRegistration *mOfonoNetworkRegistration;
     QOfonoMessageWaiting *mOfonoMessageWaiting;
     OfonoSupplementaryServices *mOfonoSupplementaryServices;

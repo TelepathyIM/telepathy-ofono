@@ -152,7 +152,7 @@ void oFonoConferenceCallChannel::init()
     mDTMFIface->setStopToneCallback(Tp::memFun(this,&oFonoConferenceCallChannel::onDTMFStopTone));
 
     QObject::connect(mBaseChannel.data(), &Tp::BaseChannel::closed, this, &oFonoConferenceCallChannel::deleteLater);
-    QObject::connect(mConnection->callVolume(), &OfonoCallVolume::mutedChanged, this, &oFonoConferenceCallChannel::onOfonoMuteChanged);
+    QObject::connect(mConnection->callVolume(), &QOfonoCallVolume::mutedChanged, this, &oFonoConferenceCallChannel::onOfonoMuteChanged);
     QObject::connect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::sendTonesComplete, this, &oFonoConferenceCallChannel::onDtmfComplete);
 
     QObject::connect(mConnection, &oFonoConnection::channelMerged, this, &oFonoConferenceCallChannel::onChannelMerged);

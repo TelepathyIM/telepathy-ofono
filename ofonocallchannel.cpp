@@ -151,7 +151,7 @@ void oFonoCallChannel::init()
 
     mCallChannel->setCallState(Tp::CallStateInitialised, 0, reason, stateDetails);
     QObject::connect(mBaseChannel.data(), &Tp::BaseChannel::closed, this,  &oFonoCallChannel::deleteLater);
-    QObject::connect(mConnection->callVolume(), &OfonoCallVolume::mutedChanged, this,  &oFonoCallChannel::onOfonoMuteChanged);
+    QObject::connect(mConnection->callVolume(), &QOfonoCallVolume::mutedChanged, this,  &oFonoCallChannel::onOfonoMuteChanged);
     QObject::connect(this,  &oFonoCallChannel::stateChanged, this,  &oFonoCallChannel::onOfonoCallStateChanged);
     QObject::connect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::sendTonesComplete, this,  &oFonoCallChannel::onDtmfComplete);
     QObject::connect(this,  &oFonoCallChannel::multipartyChanged, this,  &oFonoCallChannel::onMultipartyChanged);

@@ -61,7 +61,8 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     /// TODO porting setting?
     mOfonoVoiceCallManager = new QOfonoVoiceCallManager(this);
     mOfonoVoiceCallManager->setModemPath(mModemPath);
-    mOfonoCallVolume = new OfonoCallVolume(setting, mModemPath);
+    mOfonoCallVolume = new QOfonoCallVolume(this);
+    mOfonoCallVolume->setModemPath(mModemPath);
     mOfonoNetworkRegistration = new OfonoNetworkRegistration(setting, mModemPath);
     /// TODO porting setting?
     mOfonoMessageWaiting = new QOfonoMessageWaiting(this);
@@ -939,7 +940,7 @@ QOfonoVoiceCallManager *oFonoConnection::voiceCallManager()
     return mOfonoVoiceCallManager;
 }
 
-OfonoCallVolume *oFonoConnection::callVolume()
+QOfonoCallVolume *oFonoConnection::callVolume()
 {
     return mOfonoCallVolume;
 }

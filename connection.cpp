@@ -63,7 +63,8 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     mOfonoVoiceCallManager->setModemPath(mModemPath);
     mOfonoCallVolume = new QOfonoCallVolume(this);
     mOfonoCallVolume->setModemPath(mModemPath);
-    mOfonoNetworkRegistration = new OfonoNetworkRegistration(setting, mModemPath);
+    mOfonoNetworkRegistration = new QOfonoNetworkRegistration(this);
+    mOfonoNetworkRegistration->setModemPath(mModemPath);
     /// TODO porting setting?
     mOfonoMessageWaiting = new QOfonoMessageWaiting(this);
     mOfonoMessageWaiting->setModemPath(mModemPath);
@@ -212,10 +213,11 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     QObject::connect(mOfonoSimManager, &OfonoSimManager::presenceChanged, this, &oFonoConnection::updateOnlineStatus);
     QObject::connect(mOfonoSimManager, &OfonoSimManager::pinRequiredChanged, this, &oFonoConnection::updateOnlineStatus);
     QObject::connect(mOfonoSimManager, &OfonoSimManager::subscriberNumbersChanged, this, &oFonoConnection::updateOnlineStatus);
-    QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::statusChanged, this, &oFonoConnection::updateOnlineStatus);
-    QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::nameChanged, this, &oFonoConnection::updateOnlineStatus);
-    QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::mccChanged, this, &oFonoConnection::updateOnlineStatus);
-    QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::validityChanged, this, &oFonoConnection::onValidityChanged);
+    QObject::connect(mOfonoNetworkRegistration, &QOfonoNetworkRegistration::statusChanged, this, &oFonoConnection::updateOnlineStatus);
+    QObject::connect(mOfonoNetworkRegistration, &QOfonoNetworkRegistration::nameChanged, this, &oFonoConnection::updateOnlineStatus);
+    QObject::connect(mOfonoNetworkRegistration, &QOfonoNetworkRegistration::mccChanged, this, &oFonoConnection::updateOnlineStatus);
+    // TODO porting can this be gone
+    //QObject::connect(mOfonoNetworkRegistration, &QOfonoNetworkRegistration::validityChanged, this, &oFonoConnection::onValidityChanged);
     QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailMessageCountChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailCount);
     QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailWaitingChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailIndicator);
     QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailMailboxNumberChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailNumber);
@@ -550,7 +552,7 @@ void oFonoConnection::onValidityChanged(bool valid)
     if (sender() == mOfonoSimManager) {
         Q_EMIT mOfonoSimManager->modem()->pathChanged(mOfonoModem->path());
     } else if (sender() == mOfonoNetworkRegistration) {
-        Q_EMIT mOfonoNetworkRegistration->modem()->pathChanged(mOfonoModem->path());
+        //Q_EMIT mOfonoNetworkRegistration->modem()->pathChanged(mOfonoModem->path());
     } else if (sender() == mOfonoVoiceCallManager) {
         /// todo porting can this safely be removed?
         //Q_EMIT mOfonoVoiceCallManager->modem()->pathChanged(mOfonoModem->path());

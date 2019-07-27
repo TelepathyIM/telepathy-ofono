@@ -32,10 +32,10 @@
 #include <qofonocallvolume.h>
 #include <qofonomessagemanager.h>
 #include <qofonomessagewaiting.h>
+#include <qofononetworkregistration.h>
 
 // ofono-qt
 #include <ofonomodemmanager.h>
-#include <ofononetworkregistration.h>
 #include <ofonosupplementaryservices.h>
 #include <ofonosimmanager.h>
 
@@ -158,7 +158,7 @@ private:
     QOfonoMessageManager *mOfonoMessageManager;
     QOfonoVoiceCallManager *mOfonoVoiceCallManager;
     QOfonoCallVolume *mOfonoCallVolume;
-    OfonoNetworkRegistration *mOfonoNetworkRegistration;
+    QOfonoNetworkRegistration *mOfonoNetworkRegistration;
     QOfonoMessageWaiting *mOfonoMessageWaiting;
     OfonoSupplementaryServices *mOfonoSupplementaryServices;
     OfonoSimManager *mOfonoSimManager;

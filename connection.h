@@ -33,10 +33,10 @@
 #include <qofonomessagemanager.h>
 #include <qofonomessagewaiting.h>
 #include <qofononetworkregistration.h>
+#include <qofonosupplementaryservices.h>
 
 // ofono-qt
 #include <ofonomodemmanager.h>
-#include <ofonosupplementaryservices.h>
 #include <ofonosimmanager.h>
 
 //  telepathy-ofono
@@ -160,7 +160,7 @@ private:
     QOfonoCallVolume *mOfonoCallVolume;
     QOfonoNetworkRegistration *mOfonoNetworkRegistration;
     QOfonoMessageWaiting *mOfonoMessageWaiting;
-    OfonoSupplementaryServices *mOfonoSupplementaryServices;
+    QOfonoSupplementaryServices *mOfonoSupplementaryServices;
     OfonoSimManager *mOfonoSimManager;
     OfonoModem *mOfonoModem;
     Tp::SimplePresence mSelfPresence;

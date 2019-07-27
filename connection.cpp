@@ -68,7 +68,8 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     /// TODO porting setting?
     mOfonoMessageWaiting = new QOfonoMessageWaiting(this);
     mOfonoMessageWaiting->setModemPath(mModemPath);
-    mOfonoSupplementaryServices = new OfonoSupplementaryServices(setting, mModemPath);
+    mOfonoSupplementaryServices = new QOfonoSupplementaryServices(this);
+    mOfonoSupplementaryServices->setModemPath(mModemPath);
     mOfonoSimManager = new OfonoSimManager(setting, mModemPath);
     mOfonoModem = mOfonoSimManager->modem();
 
@@ -225,19 +226,20 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     QObject::connect(mMmsdManager, &MMSDManager::serviceAdded, this, &oFonoConnection::onMMSDServiceAdded);
     QObject::connect(mMmsdManager, &MMSDManager::serviceRemoved, this, &oFonoConnection::onMMSDServiceRemoved);
 
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::notificationReceived, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::NotificationReceived);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::requestReceived, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::RequestReceived);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::initiateUSSDComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::InitiateUSSDComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::barringComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::BarringComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::forwardingComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ForwardingComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::waitingComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::WaitingComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::callingLinePresentationComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::CallingLinePresentationComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::connectedLinePresentationComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ConnectedLinePresentationComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::callingLineRestrictionComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::CallingLineRestrictionComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::connectedLineRestrictionComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ConnectedLineRestrictionComplete);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::initiateFailed, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::InitiateFailed);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::stateChanged, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::StateChanged);
-    QObject::connect(mOfonoSupplementaryServices, &OfonoSupplementaryServices::respondComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::RespondComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::notificationReceived, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::NotificationReceived);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::requestReceived, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::RequestReceived);
+    // todo porting
+    //QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::initiateUSSDComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::InitiateUSSDComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::callBarringResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::BarringComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::callForwardingResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ForwardingComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::callWaitingResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::WaitingComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::callingLinePresentationResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::CallingLinePresentationComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::connectedLinePresentationResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ConnectedLinePresentationComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::callingLineRestrictionResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::CallingLineRestrictionComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::connectedLineRestrictionResponse, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::ConnectedLineRestrictionComplete);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::initiateFailed, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::InitiateFailed);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::stateChanged, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::StateChanged);
+    QObject::connect(mOfonoSupplementaryServices, &QOfonoSupplementaryServices::respondComplete, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::RespondComplete);
 
     QObject::connect(this, &oFonoConnection::disconnected, this, &oFonoConnection::onDisconnected);
     // workaround: we can't add services here as tp-ofono interfaces are not exposed on dbus

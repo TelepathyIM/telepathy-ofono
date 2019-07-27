@@ -29,12 +29,12 @@
 
 // qofono
 #include <qofonomodem.h>
+#include <qofonovoicecallmanager.h>
 #include <qofonomessagemanager.h>
 #include <qofonomessagewaiting.h>
 
 // ofono-qt
 #include <ofonomodemmanager.h>
-#include <ofonovoicecallmanager.h>
 #include <ofonovoicecall.h>
 #include <ofonocallvolume.h>
 #include <ofononetworkregistration.h>
@@ -94,7 +94,7 @@ public:
     uint newGroupHandle(const QString &identifier);
 
     QOfonoMessageManager *messageManager();
-    OfonoVoiceCallManager *voiceCallManager();
+    QOfonoVoiceCallManager *voiceCallManager();
     OfonoCallVolume *callVolume();
     QMap<QString, oFonoCallChannel*> callChannels();
 
@@ -122,7 +122,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onOfonoIncomingMessage(const QString &message, const QVariantMap &info);
     void onOfonoImmediateMessage(const QString &message, const QVariantMap &info);
-    void onOfonoCallAdded(const QString &call, const QVariantMap &properties);
+    void onOfonoCallAdded(const QString &call);//, const QVariantMap &properties);
     void onTextChannelClosed();
     void onCallChannelClosed();
     void onCallChannelDestroyed();
@@ -158,7 +158,7 @@ private:
     QStringList mModems;
     OfonoModemManager *mOfonoModemManager;
     QOfonoMessageManager *mOfonoMessageManager;
-    OfonoVoiceCallManager *mOfonoVoiceCallManager;
+    QOfonoVoiceCallManager *mOfonoVoiceCallManager;
     OfonoCallVolume *mOfonoCallVolume;
     OfonoNetworkRegistration *mOfonoNetworkRegistration;
     QOfonoMessageWaiting *mOfonoMessageWaiting;

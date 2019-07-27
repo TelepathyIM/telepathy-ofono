@@ -54,7 +54,10 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     if (!mModemPath.isEmpty()) {
         setting = OfonoModem::ManualSelect;
     }
-    mOfonoMessageManager = new OfonoMessageManager(setting, mModemPath);
+
+    //TODO porting 'setting'?? was getting passed to ModemInterface
+    mOfonoMessageManager = new QOfonoMessageManager(this);
+    mOfonoMessageManager->setModemPath(mModemPath);
     mOfonoVoiceCallManager = new OfonoVoiceCallManager(setting, mModemPath);
     mOfonoCallVolume = new OfonoCallVolume(setting, mModemPath);
     mOfonoNetworkRegistration = new OfonoNetworkRegistration(setting, mModemPath);
@@ -193,9 +196,10 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     QObject::connect(mOfonoModem, &OfonoModem::onlineChanged, this, &oFonoConnection::updateOnlineStatus);
     QObject::connect(mOfonoModem, &OfonoModem::serialChanged, supplementaryServicesIface.data(), &BaseConnectionUSSDInterface::setSerial);
     QObject::connect(mOfonoModem, &OfonoModem::interfacesChanged, this, &oFonoConnection::updateOnlineStatus);
-    QObject::connect(mOfonoMessageManager, &OfonoMessageManager::incomingMessage, this, &oFonoConnection::onOfonoIncomingMessage);
-    QObject::connect(mOfonoMessageManager, &OfonoMessageManager::immediateMessage, this, &oFonoConnection::onOfonoImmediateMessage);
-    QObject::connect(mOfonoMessageManager, &OfonoMessageManager::statusReport, this, &oFonoConnection::onDeliveryReportReceived);
+    QObject::connect(mOfonoMessageManager, &QOfonoMessageManager::incomingMessage, this, &oFonoConnection::onOfonoIncomingMessage);
+    QObject::connect(mOfonoMessageManager, &QOfonoMessageManager::immediateMessage, this, &oFonoConnection::onOfonoImmediateMessage);
+    //TODO porting: is that equivalent to receiving a status report?
+    //QObject::connect(mOfonoMessageManager, &QOfonoMessageManager::sendMessageComplete, this, &oFonoConnection::onDeliveryReportReceived);
     QObject::connect(mOfonoVoiceCallManager, &OfonoVoiceCallManager::callAdded, this, &oFonoConnection::onOfonoCallAdded);
     /// \TODO: this is actually a misnamed slot in ofono-qt/OfonoVoiceCallManager
     QObject::connect(mOfonoVoiceCallManager, SIGNAL(validityChanged(bool)), SLOT(onValidityChanged(bool)));
@@ -918,7 +922,7 @@ Tp::BaseChannelPtr oFonoConnection::createChannel(const QVariantMap &request, Tp
     return Tp::BaseChannelPtr();
 }
 
-OfonoMessageManager *oFonoConnection::messageManager()
+QOfonoMessageManager *oFonoConnection::messageManager()
 {
     return mOfonoMessageManager;
 }

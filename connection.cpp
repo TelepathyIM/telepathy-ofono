@@ -43,7 +43,7 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
                             const QString &protocolName,
                             const QVariantMap &parameters) :
     Tp::BaseConnection(dbusConnection, cmName, protocolName, parameters),
-    mOfonoModemManager(new OfonoModemManager(this)),
+    mOfonoManager(new QOfonoManager(this)),
     mHandleCount(0),
     mGroupHandleCount(0),
     mMmsdManager(new MMSDManager(this)),
@@ -493,7 +493,7 @@ oFonoConnection::~oFonoConnection() {
     dbusConnection().unregisterObject(objectPath(), QDBusConnection::UnregisterTree);
     dbusConnection().unregisterService(busName());
 
-    mOfonoModemManager->deleteLater();
+    mOfonoManager->deleteLater();
     mOfonoMessageManager->deleteLater();
     mOfonoVoiceCallManager->deleteLater();
     mOfonoCallVolume->deleteLater();

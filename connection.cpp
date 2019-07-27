@@ -58,7 +58,9 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     //TODO porting 'setting'?? was getting passed to ModemInterface
     mOfonoMessageManager = new QOfonoMessageManager(this);
     mOfonoMessageManager->setModemPath(mModemPath);
-    mOfonoVoiceCallManager = new OfonoVoiceCallManager(setting, mModemPath);
+    /// TODO porting setting?
+    mOfonoVoiceCallManager = new QOfonoVoiceCallManager(this);
+    mOfonoVoiceCallManager->setModemPath(mModemPath);
     mOfonoCallVolume = new OfonoCallVolume(setting, mModemPath);
     mOfonoNetworkRegistration = new OfonoNetworkRegistration(setting, mModemPath);
     /// TODO porting setting?
@@ -131,7 +133,7 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     // init custom emergency mode interface (not provided by telepathy
     emergencyModeIface = BaseConnectionEmergencyModeInterface::create();
     emergencyModeIface->setEmergencyNumbersCallback(Tp::memFun(this,&oFonoConnection::emergencyNumbers));
-    QObject::connect(mOfonoVoiceCallManager, &OfonoVoiceCallManager::emergencyNumbersChanged,
+    QObject::connect(mOfonoVoiceCallManager, &QOfonoVoiceCallManager::emergencyNumbersChanged,
                      emergencyModeIface.data(), &BaseConnectionEmergencyModeInterface::setEmergencyNumbers);
     plugInterface(Tp::AbstractConnectionInterfacePtr::dynamicCast(emergencyModeIface));
     emergencyModeIface->setEmergencyNumbers(mOfonoVoiceCallManager->emergencyNumbers());
@@ -202,7 +204,7 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     QObject::connect(mOfonoMessageManager, &QOfonoMessageManager::immediateMessage, this, &oFonoConnection::onOfonoImmediateMessage);
     //TODO porting: is that equivalent to receiving a status report?
     //QObject::connect(mOfonoMessageManager, &QOfonoMessageManager::sendMessageComplete, this, &oFonoConnection::onDeliveryReportReceived);
-    QObject::connect(mOfonoVoiceCallManager, &OfonoVoiceCallManager::callAdded, this, &oFonoConnection::onOfonoCallAdded);
+    QObject::connect(mOfonoVoiceCallManager, &QOfonoVoiceCallManager::callAdded, this, &oFonoConnection::onOfonoCallAdded);
     /// \TODO: this is actually a misnamed slot in ofono-qt/OfonoVoiceCallManager
     QObject::connect(mOfonoVoiceCallManager, SIGNAL(validityChanged(bool)), SLOT(onValidityChanged(bool)));
     QObject::connect(mOfonoSimManager, &OfonoSimManager::validityChanged, this, &oFonoConnection::onValidityChanged);
@@ -549,7 +551,8 @@ void oFonoConnection::onValidityChanged(bool valid)
     } else if (sender() == mOfonoNetworkRegistration) {
         Q_EMIT mOfonoNetworkRegistration->modem()->pathChanged(mOfonoModem->path());
     } else if (sender() == mOfonoVoiceCallManager) {
-        Q_EMIT mOfonoVoiceCallManager->modem()->pathChanged(mOfonoModem->path());
+        /// todo porting can this safely be removed?
+        //Q_EMIT mOfonoVoiceCallManager->modem()->pathChanged(mOfonoModem->path());
     }
     QString modemSerial;
     if (valid) {
@@ -832,21 +835,23 @@ Tp::BaseChannelPtr oFonoConnection::createCallChannel(const QVariantMap &request
             return Tp::BaseChannelPtr();
         }
 
-        QList<QDBusObjectPath> channels = mOfonoVoiceCallManager->createMultiparty();
-        if (!channels.isEmpty()) {
+        // todo porting error handling
+        /*QList<QDBusObjectPath> channels =*/ mOfonoVoiceCallManager->createMultiparty();
+        //if (!channels.isEmpty()) {
             mConferenceCall = new oFonoConferenceCallChannel(this);
             QObject::connect(mConferenceCall, &oFonoConferenceCallChannel::destroyed, this, &oFonoConnection::onConferenceCallChannelClosed);
             mConferenceCall->baseChannel()->setInitiatorHandle(initiatorHandle);
             return mConferenceCall->baseChannel();
-        }
-        error->set(TP_QT_ERROR_NOT_AVAILABLE, "Impossible to merge calls");
-        return Tp::BaseChannelPtr();
+        //}
+        //error->set(TP_QT_ERROR_NOT_AVAILABLE, "Impossible to merge calls");
+        //return Tp::BaseChannelPtr();
     }
 
     QDBusObjectPath objpath(request["ofonoObjPath"].toString());
 
     if (objpath.path().isEmpty()) {
-        objpath = mOfonoVoiceCallManager->dial(newPhoneNumber, "", success);
+        /// todo porting error handling
+        /*objpath =*/ mOfonoVoiceCallManager->dial(newPhoneNumber, "");//, success);
     }
 
     qDebug() << "success " << success;
@@ -929,7 +934,7 @@ QOfonoMessageManager *oFonoConnection::messageManager()
     return mOfonoMessageManager;
 }
 
-OfonoVoiceCallManager *oFonoConnection::voiceCallManager()
+QOfonoVoiceCallManager *oFonoConnection::voiceCallManager()
 {
     return mOfonoVoiceCallManager;
 }
@@ -1095,13 +1100,13 @@ bool oFonoConnection::matchChannel(const Tp::BaseChannelPtr &channel, const QVar
     return (channelType == TP_QT_IFACE_CHANNEL_TYPE_TEXT) && BaseConnection::matchChannel(channel, request, error);
 }
 
-void oFonoConnection::onOfonoCallAdded(const QString &call, const QVariantMap &properties)
+void oFonoConnection::onOfonoCallAdded(const QString &call/*, const QVariantMap &properties*/)
 {
-    qDebug() << "new call" << call << properties;
+    qDebug() << "new call" << call;// << properties;
 
     bool yours;
     Tp::DBusError error;
-    QString lineIdentification = properties["LineIdentification"].toString();
+    QString lineIdentification;// = properties["LineIdentification"].toString();
 
     // check if there is an open channel for this call, if so, ignore it
     if (mCallChannels.keys().contains(call)) {
@@ -1125,11 +1130,11 @@ void oFonoConnection::onOfonoCallAdded(const QString &call, const QVariantMap &p
 
     uint handle = ensureHandle(normalizedNumber);
     uint initiatorHandle = 0;
-    if (properties["State"] == "incoming" || properties["State"] == "waiting") {
+    //if (properties["State"] == "incoming" || properties["State"] == "waiting") {
         initiatorHandle = handle;
-    } else {
-        initiatorHandle = selfHandle();
-    }
+    //} else {
+    //    initiatorHandle = selfHandle();
+    //}
 
     qDebug() << "initiatorHandle " <<initiatorHandle;
     qDebug() << "handle" << handle;

@@ -153,7 +153,7 @@ void oFonoCallChannel::init()
     QObject::connect(mBaseChannel.data(), &Tp::BaseChannel::closed, this,  &oFonoCallChannel::deleteLater);
     QObject::connect(mConnection->callVolume(), &OfonoCallVolume::mutedChanged, this,  &oFonoCallChannel::onOfonoMuteChanged);
     QObject::connect(this,  &oFonoCallChannel::stateChanged, this,  &oFonoCallChannel::onOfonoCallStateChanged);
-    QObject::connect(mConnection->voiceCallManager(), &OfonoVoiceCallManager::sendTonesComplete, this,  &oFonoCallChannel::onDtmfComplete);
+    QObject::connect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::sendTonesComplete, this,  &oFonoCallChannel::onDtmfComplete);
     QObject::connect(this,  &oFonoCallChannel::multipartyChanged, this,  &oFonoCallChannel::onMultipartyChanged);
     
     QObject::connect(this,  &oFonoCallChannel::disconnectReason, this,  &oFonoCallChannel::onDisconnectReason);
@@ -183,11 +183,11 @@ void oFonoCallChannel::onOfonoMuteChanged(bool mute)
 void oFonoCallChannel::onHoldStateChanged(const Tp::LocalHoldState &state, const Tp::LocalHoldStateReason &reason, Tp::DBusError *error)
 {
     if (state == Tp::LocalHoldStateHeld && this->state() == "active") {
-        QObject::connect(mConnection->voiceCallManager(), &OfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
+        QObject::connect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
         mConnection->voiceCallManager()->swapCalls();
         mHoldIface->setHoldState(Tp::LocalHoldStatePendingHold, Tp::LocalHoldStateReasonRequested);
     } else if (state == Tp::LocalHoldStateUnheld && this->state() == "held") {
-        QObject::connect(mConnection->voiceCallManager(), &OfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
+        QObject::connect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
         mConnection->voiceCallManager()->swapCalls();
         mHoldIface->setHoldState(Tp::LocalHoldStatePendingUnhold, Tp::LocalHoldStateReasonRequested);
     }
@@ -196,12 +196,12 @@ void oFonoCallChannel::onHoldStateChanged(const Tp::LocalHoldState &state, const
 void oFonoCallChannel::onSwapCallsComplete(bool success)
 {
     if (!success /*&& errorName() == "org.ofono.Error.InProgress"   TODO: PORTING */) {
-        QTimer::singleShot(2000, mConnection->voiceCallManager(), &OfonoVoiceCallManager::swapCalls);
+        QTimer::singleShot(2000, mConnection->voiceCallManager(), &QOfonoVoiceCallManager::swapCalls);
         return;
     }
     Tp::LocalHoldState holdState = this->state() == "active" ? Tp::LocalHoldStateUnheld : Tp::LocalHoldStateHeld;
     Tp::LocalHoldStateReason reason = success ? Tp::LocalHoldStateReasonRequested : Tp::LocalHoldStateReasonResourceNotAvailable;
-    QObject::disconnect(mConnection->voiceCallManager(), &OfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
+    QObject::disconnect(mConnection->voiceCallManager(), &QOfonoVoiceCallManager::swapCallsComplete, this, &oFonoCallChannel::onSwapCallsComplete);
     mHoldIface->setHoldState(holdState, reason);
 }
 

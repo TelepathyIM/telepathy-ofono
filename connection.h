@@ -27,10 +27,12 @@
 #include <TelepathyQt/AbstractAdaptor>
 #include <TelepathyQt/DBusError>
 
+// qofono
+#include <qofonomodem.h>
+#include <qofonomessagemanager.h>
+
 // ofono-qt
-#include <ofonomodem.h>
 #include <ofonomodemmanager.h>
-#include <ofonomessagemanager.h>
 #include <ofonovoicecallmanager.h>
 #include <ofonovoicecall.h>
 #include <ofonocallvolume.h>
@@ -39,7 +41,8 @@
 #include <ofonosupplementaryservices.h>
 #include <ofonosimmanager.h>
 
-// telepathy-ofono
+//  telepathy-ofono
+
 #include "ofonotextchannel.h"
 #include "ofonocallchannel.h"
 #include "emergencymodeiface.h"
@@ -50,7 +53,7 @@
 #include "ussdiface.h"
 
 
-class oFonoConnection;
+//class oFonoConnection;
 class oFonoTextChannel;
 class oFonoCallChannel;
 class oFonoConferenceCallChannel;
@@ -90,7 +93,7 @@ public:
     uint newHandle(const QString &identifier);
     uint newGroupHandle(const QString &identifier);
 
-    OfonoMessageManager *messageManager();
+    QOfonoMessageManager *messageManager();
     OfonoVoiceCallManager *voiceCallManager();
     OfonoCallVolume *callVolume();
     QMap<QString, oFonoCallChannel*> callChannels();
@@ -154,7 +157,7 @@ private:
 
     QStringList mModems;
     OfonoModemManager *mOfonoModemManager;
-    OfonoMessageManager *mOfonoMessageManager;
+    QOfonoMessageManager *mOfonoMessageManager;
     OfonoVoiceCallManager *mOfonoVoiceCallManager;
     OfonoCallVolume *mOfonoCallVolume;
     OfonoNetworkRegistration *mOfonoNetworkRegistration;

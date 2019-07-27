@@ -269,8 +269,9 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
     if (mPhoneNumbers.size() == 1) {
         QString phoneNumber = mPhoneNumbers[0];
         uint handle = mConnection->ensureHandle(phoneNumber);
-        objpath = mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString(), success).path();
-        if (objpath.isEmpty() || !success) {
+        /// TODO porting how does error handling work with qofono?
+        /*objpath = */ mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString());//, success).path();
+        /*if (objpath.isEmpty() || !success) {
             if (!success) {
                 qWarning() << mConnection->messageManager()->errorName() << mConnection->messageManager()->errorMessage();
             } else {
@@ -293,24 +294,25 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
         }
         // FIXME: track pending messages only if delivery reports are enabled. We need a system config option for it.
         PendingMessagesManager::instance()->addPendingMessage(objpath, mPhoneNumbers[0]);
-        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
+        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);*/
         return objpath;
     } else {
         // Broadcast sms
         bool someMessageSent = false;
         QString lastPhoneNumber;
         Q_FOREACH(const QString &phoneNumber, mPhoneNumbers) {
-            objpath = mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString(), success).path();
+            /*objpath =*/ mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString());//, success).path();
             lastPhoneNumber = phoneNumber;
             // dont fail if this is a broadcast chat as we cannot track individual messages
-            if (objpath.isEmpty() || !success) {
+            // TODo PORTING reenable error handling
+            /*if (objpath.isEmpty() || !success) {
                 if (!success) {
                     qWarning() << mConnection->messageManager()->errorName() << mConnection->messageManager()->errorMessage();
                 } else {
                     error->set(TP_QT_ERROR_INVALID_ARGUMENT, mConnection->messageManager()->errorMessage());
                 }
                 continue;
-            }
+            }*/
             someMessageSent = true;
         }
         if (!someMessageSent) {

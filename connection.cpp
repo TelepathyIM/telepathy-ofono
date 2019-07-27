@@ -61,7 +61,9 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     mOfonoVoiceCallManager = new OfonoVoiceCallManager(setting, mModemPath);
     mOfonoCallVolume = new OfonoCallVolume(setting, mModemPath);
     mOfonoNetworkRegistration = new OfonoNetworkRegistration(setting, mModemPath);
-    mOfonoMessageWaiting = new OfonoMessageWaiting(setting, mModemPath);
+    /// TODO porting setting?
+    mOfonoMessageWaiting = new QOfonoMessageWaiting(this);
+    mOfonoMessageWaiting->setModemPath(mModemPath);
     mOfonoSupplementaryServices = new OfonoSupplementaryServices(setting, mModemPath);
     mOfonoSimManager = new OfonoSimManager(setting, mModemPath);
     mOfonoModem = mOfonoSimManager->modem();
@@ -211,9 +213,9 @@ oFonoConnection::oFonoConnection(const QDBusConnection &dbusConnection,
     QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::nameChanged, this, &oFonoConnection::updateOnlineStatus);
     QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::mccChanged, this, &oFonoConnection::updateOnlineStatus);
     QObject::connect(mOfonoNetworkRegistration, &OfonoNetworkRegistration::validityChanged, this, &oFonoConnection::onValidityChanged);
-    QObject::connect(mOfonoMessageWaiting, &OfonoMessageWaiting::voicemailMessageCountChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailCount);
-    QObject::connect(mOfonoMessageWaiting, &OfonoMessageWaiting::voicemailWaitingChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailIndicator);
-    QObject::connect(mOfonoMessageWaiting, &OfonoMessageWaiting::voicemailMailboxNumberChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailNumber);
+    QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailMessageCountChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailCount);
+    QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailWaitingChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailIndicator);
+    QObject::connect(mOfonoMessageWaiting, &QOfonoMessageWaiting::voicemailMailboxNumberChanged, voicemailIface.data(), &BaseConnectionVoicemailInterface::setVoicemailNumber);
 
     QObject::connect(mMmsdManager, &MMSDManager::serviceAdded, this, &oFonoConnection::onMMSDServiceAdded);
     QObject::connect(mMmsdManager, &MMSDManager::serviceRemoved, this, &oFonoConnection::onMMSDServiceRemoved);

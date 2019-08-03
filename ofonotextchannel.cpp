@@ -17,8 +17,8 @@
  *          Gustavo Pichorim Boiko <gustavo.boiko@canonical.com>
  */
 
-// ofono-qt
-#include <ofonomessage.h>
+// qofono
+#include <qofonomessage.h>
 
 // telepathy-ofono
 #include "ofonotextchannel.h"
@@ -117,7 +117,7 @@ oFonoTextChannel::oFonoTextChannel(oFonoConnection *conn, const QString &targetI
     mBaseChannel = baseChannel;
     mTextChannel = Tp::BaseChannelTextTypePtr::dynamicCast(mBaseChannel->interface(TP_QT_IFACE_CHANNEL_TYPE_TEXT));
     mTextChannel->setMessageAcknowledgedCallback(Tp::memFun(this,&oFonoTextChannel::messageAcknowledged));
-    QObject::connect(mBaseChannel.data(), SIGNAL(closed()), this, SLOT(deleteLater()));
+    QObject::connect(mBaseChannel.data(), &Tp::BaseChannel::closed, this, &oFonoTextChannel::deleteLater);
 }
 
 Tp::UIntList oFonoTextChannel::members()
@@ -232,7 +232,7 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             Q_FOREACH(const QString &phoneNumber, mPhoneNumbers) {
                 QString realObjpath = mConnection->sendMMS(QStringList() << phoneNumber, attachments).path();
                 MMSDMessage *msg = new MMSDMessage(realObjpath, QVariantMap(), this);
-                QObject::connect(msg, SIGNAL(propertyChanged(QString,QVariant)), SLOT(onMMSPropertyChanged(QString,QVariant)));
+                QObject::connect(msg, &MMSDMessage::propertyChanged, this, &oFonoTextChannel::onMMSPropertyChanged);
                 mPendingBroadcastMMS[realObjpath] = objpath;
                 mPendingDeliveryReportUnknown[objpath] = handle;
                 QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
@@ -256,7 +256,7 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             return objpath;
         }
         MMSDMessage *msg = new MMSDMessage(objpath, QVariantMap(), this);
-        QObject::connect(msg, SIGNAL(propertyChanged(QString,QVariant)), SLOT(onMMSPropertyChanged(QString,QVariant)));
+        QObject::connect(msg, &MMSDMessage::propertyChanged, this, &oFonoTextChannel::onMMSPropertyChanged);
         mPendingDeliveryReportUnknown[objpath] = handle;
         QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
         if (temporaryFiles.size() > 0) {
@@ -269,8 +269,9 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
     if (mPhoneNumbers.size() == 1) {
         QString phoneNumber = mPhoneNumbers[0];
         uint handle = mConnection->ensureHandle(phoneNumber);
-        objpath = mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString(), success).path();
-        if (objpath.isEmpty() || !success) {
+        /// TODO porting how does error handling work with qofono?
+        /*objpath = */ mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString());//, success).path();
+        /*if (objpath.isEmpty() || !success) {
             if (!success) {
                 qWarning() << mConnection->messageManager()->errorName() << mConnection->messageManager()->errorMessage();
             } else {
@@ -282,7 +283,8 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
             return objpath;
         }
-        OfonoMessage *msg = new OfonoMessage(objpath);
+        QOfonoMessage *msg = new QOfonoMessage(this);
+        msg->setMessagePath(objpath);
         if (msg->state() == "") {
             // message was already sent or failed too fast (this case is only reproducible with the emulator)
             msg->deleteLater();
@@ -292,24 +294,25 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
         }
         // FIXME: track pending messages only if delivery reports are enabled. We need a system config option for it.
         PendingMessagesManager::instance()->addPendingMessage(objpath, mPhoneNumbers[0]);
-        QObject::connect(msg, SIGNAL(stateChanged(QString)), SLOT(onOfonoMessageStateChanged(QString)));
+        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);*/
         return objpath;
     } else {
         // Broadcast sms
         bool someMessageSent = false;
         QString lastPhoneNumber;
         Q_FOREACH(const QString &phoneNumber, mPhoneNumbers) {
-            objpath = mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString(), success).path();
+            /*objpath =*/ mConnection->messageManager()->sendMessage(phoneNumber, body["content"].variant().toString());//, success).path();
             lastPhoneNumber = phoneNumber;
             // dont fail if this is a broadcast chat as we cannot track individual messages
-            if (objpath.isEmpty() || !success) {
+            // TODo PORTING reenable error handling
+            /*if (objpath.isEmpty() || !success) {
                 if (!success) {
                     qWarning() << mConnection->messageManager()->errorName() << mConnection->messageManager()->errorMessage();
                 } else {
                     error->set(TP_QT_ERROR_INVALID_ARGUMENT, mConnection->messageManager()->errorMessage());
                 }
                 continue;
-            }
+            }*/
             someMessageSent = true;
         }
         if (!someMessageSent) {
@@ -320,7 +323,8 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             QTimer::singleShot(0, this, SLOT(onProcessPendingDeliveryReport()));
             return objpath;
         }
-        OfonoMessage *msg = new OfonoMessage(objpath);
+        QOfonoMessage *msg = new QOfonoMessage(this);
+        msg->setMessagePath(objpath);
         if (msg->state() == "") {
             // message was already sent or failed too fast (this case is only reproducible with the emulator)
             msg->deleteLater();
@@ -330,7 +334,7 @@ QString oFonoTextChannel::sendMessage(Tp::MessagePartList message, uint flags, T
             // return only the last one in case of group chat for history purposes
             return objpath;
         }
-        QObject::connect(msg, SIGNAL(stateChanged(QString)), SLOT(onOfonoMessageStateChanged(QString)));
+        QObject::connect(msg, &QOfonoMessage::stateChanged, this, &oFonoTextChannel::onOfonoMessageStateChanged);
         return objpath;
     }
 }
@@ -430,7 +434,7 @@ void oFonoTextChannel::onProcessPendingDeliveryReport()
 
 void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
 {
-    OfonoMessage *msg = static_cast<OfonoMessage *>(sender());
+    QOfonoMessage *msg = static_cast<QOfonoMessage *>(sender());
     if(msg) {
         Tp::DeliveryStatus delivery_status;
         if (status == "sent") {
@@ -438,7 +442,7 @@ void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
             msg->deleteLater();
         } else if(status == "failed") {
             delivery_status = Tp::DeliveryStatusPermanentlyFailed;
-            PendingMessagesManager::instance()->removePendingMessage(msg->path());
+            PendingMessagesManager::instance()->removePendingMessage(msg->messagePath());
             msg->deleteLater();
         } else if(status == "pending") {
             delivery_status = Tp::DeliveryStatusTemporarilyFailed;
@@ -446,7 +450,7 @@ void oFonoTextChannel::onOfonoMessageStateChanged(QString status)
             delivery_status = Tp::DeliveryStatusUnknown;
         }
 
-        sendDeliveryReport(msg->path(), mConnection->ensureHandle(mPhoneNumbers[0]), delivery_status);
+        sendDeliveryReport(msg->messagePath(), mConnection->ensureHandle(mPhoneNumbers[0]), delivery_status);
     }
 }
 

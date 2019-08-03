@@ -27,19 +27,20 @@
 #include <TelepathyQt/AbstractAdaptor>
 #include <TelepathyQt/DBusError>
 
-// ofono-qt
-#include <ofonomodem.h>
-#include <ofonomodemmanager.h>
-#include <ofonomessagemanager.h>
-#include <ofonovoicecallmanager.h>
-#include <ofonovoicecall.h>
-#include <ofonocallvolume.h>
-#include <ofononetworkregistration.h>
-#include <ofonomessagewaiting.h>
-#include <ofonosupplementaryservices.h>
-#include <ofonosimmanager.h>
+// qofono
+#include <qofonovoicecallmanager.h>
+#include <qofonocallvolume.h>
+#include <qofonomanager.h>
+#include <qofonomessagemanager.h>
+#include <qofonomessagewaiting.h>
+#include <qofonomodem.h>
+#include <qofononetworkregistration.h>
+#include <qofonosupplementaryservices.h>
+#include <qofonosimmanager.h>
 
-// telepathy-ofono
+
+//  telepathy-ofono
+
 #include "ofonotextchannel.h"
 #include "ofonocallchannel.h"
 #include "emergencymodeiface.h"
@@ -50,7 +51,7 @@
 #include "ussdiface.h"
 
 
-class oFonoConnection;
+//class oFonoConnection;
 class oFonoTextChannel;
 class oFonoCallChannel;
 class oFonoConferenceCallChannel;
@@ -90,9 +91,9 @@ public:
     uint newHandle(const QString &identifier);
     uint newGroupHandle(const QString &identifier);
 
-    OfonoMessageManager *messageManager();
-    OfonoVoiceCallManager *voiceCallManager();
-    OfonoCallVolume *callVolume();
+    QOfonoMessageManager *messageManager();
+    QOfonoVoiceCallManager *voiceCallManager();
+    QOfonoCallVolume *callVolume();
     QMap<QString, oFonoCallChannel*> callChannels();
 
     uint ensureHandle(const QString &phoneNumber);
@@ -119,7 +120,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onOfonoIncomingMessage(const QString &message, const QVariantMap &info);
     void onOfonoImmediateMessage(const QString &message, const QVariantMap &info);
-    void onOfonoCallAdded(const QString &call, const QVariantMap &properties);
+    void onOfonoCallAdded(const QString &call);//, const QVariantMap &properties);
     void onTextChannelClosed();
     void onCallChannelClosed();
     void onCallChannelDestroyed();
@@ -153,15 +154,15 @@ private:
     QMap<QString, oFonoCallChannel*> mCallChannels;
 
     QStringList mModems;
-    OfonoModemManager *mOfonoModemManager;
-    OfonoMessageManager *mOfonoMessageManager;
-    OfonoVoiceCallManager *mOfonoVoiceCallManager;
-    OfonoCallVolume *mOfonoCallVolume;
-    OfonoNetworkRegistration *mOfonoNetworkRegistration;
-    OfonoMessageWaiting *mOfonoMessageWaiting;
-    OfonoSupplementaryServices *mOfonoSupplementaryServices;
-    OfonoSimManager *mOfonoSimManager;
-    OfonoModem *mOfonoModem;
+    QOfonoManager *mOfonoManager;
+    QOfonoMessageManager *mOfonoMessageManager;
+    QOfonoVoiceCallManager *mOfonoVoiceCallManager;
+    QOfonoCallVolume *mOfonoCallVolume;
+    QOfonoNetworkRegistration *mOfonoNetworkRegistration;
+    QOfonoMessageWaiting *mOfonoMessageWaiting;
+    QOfonoSupplementaryServices *mOfonoSupplementaryServices;
+    QOfonoSimManager *mOfonoSimManager;
+    QOfonoModem *mOfonoModem;
     Tp::SimplePresence mSelfPresence;
     MMSDManager *mMmsdManager;
     QMap<QString, MMSDService*> mMmsdServices;

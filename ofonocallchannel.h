@@ -26,13 +26,14 @@
 #include <TelepathyQt/BaseCall>
 #include <TelepathyQt/Types>
 
-#include <ofonovoicecall.h>
+// qofono
+#include <qofonovoicecall.h>
 
 #include "connection.h"
 
 class oFonoConnection;
 
-class oFonoCallChannel : public OfonoVoiceCall
+class oFonoCallChannel : public QOfonoVoiceCall
 {
     Q_OBJECT
 public:

@@ -34,9 +34,9 @@ qt5_add_dbus_adaptor(library_SRCS VoiceCallManagerPrivate.xml voicecallmanagerpr
 qt5_add_dbus_adaptor(library_SRCS VoiceCallPrivate.xml voicecallprivate.h VoiceCallPrivate)
 qt5_add_dbus_adaptor(library_SRCS SimManagerPrivate.xml simmanagerprivate.h SimManagerPrivate)
 
-add_library(ofono-qt-mock SHARED ${library_SRCS})
-set_target_properties(ofono-qt-mock PROPERTIES
-     OUTPUT_NAME "ofono-qt"
+add_library(qofono-mock SHARED ${library_SRCS})
+set_target_properties(qofono-mock PROPERTIES
+     OUTPUT_NAME "qofono"
 )
 
 # Set the library version and the SOVERSION
@@ -44,4 +44,4 @@ set_target_properties(ofono-qt-mock PROPERTIES
 #                      SOVERSION ${HISTORY_VERSION_MAJOR}
 #                      VERSION ${HISTORY_VERSION_MAJOR}.${HISTORY_VERSION_MINOR}.${HISTORY_VERSION_PATCH})
 
-qt5_use_modules(ofono-qt-mock Core DBus)
+qt5_use_modules(qofono-mock Core DBus)

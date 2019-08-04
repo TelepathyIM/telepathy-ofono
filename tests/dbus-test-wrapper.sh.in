@@ -17,7 +17,7 @@ dconf write /org/gnome/empathy/use-conn false
 
 export PA_DISABLED=1
 # start telepathy-ofono with the ofono-qt mock library
-LD_PRELOAD=@CMAKE_CURRENT_BINARY_DIR@/mock/libofono-qt.so ${CMAKE_BINARY_DIR}/telepathy-ofono &
+LD_PRELOAD=@CMAKE_CURRENT_BINARY_DIR@/mock/libqofono.so ${CMAKE_BINARY_DIR}/telepathy-ofono &
 TP_OFONO_PID=$!
 sleep 2
 

@@ -36,7 +36,8 @@ qt5_add_dbus_adaptor(library_SRCS SimManagerPrivate.xml simmanagerprivate.h SimM
 
 add_library(qofono-mock SHARED ${library_SRCS})
 set_target_properties(qofono-mock PROPERTIES
-     OUTPUT_NAME "qofono"
+     OUTPUT_NAME "qofono-qt5"
+     SOVERSION 0
 )
 
 # Set the library version and the SOVERSION

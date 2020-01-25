@@ -800,9 +800,8 @@ Tp::BaseChannelPtr oFonoConnection::createCallChannel(const QVariantMap &request
 
     if (!newPhoneNumber.isEmpty()) {
         targetHandle = ensureHandle(newPhoneNumber);
-    } else {
-        newPhoneNumber = mHandles.value(targetHandle);
     }
+    newPhoneNumber = mHandles.value(targetHandle);
 
     bool success = true;
     bool available = (mSelfPresence.type == Tp::ConnectionPresenceTypeAvailable);

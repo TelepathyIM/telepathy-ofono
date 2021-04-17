@@ -40,6 +40,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(TP_QT5 REQUIRED TelepathyQt5)
 pkg_check_modules(SQLITE3 REQUIRED sqlite3)
 pkg_check_modules(MC_PLUGINS REQUIRED mission-control-plugins)
+pkg_check_modules(GIO REQUIRED gio-2.0)
 pkg_check_modules(OFONO_QT REQUIRED ofono-qt)
 
 find_program(DBUS_RUNNER dbus-test-runner)

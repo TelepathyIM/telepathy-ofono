@@ -11,7 +11,7 @@ VERSION_FILE=$3
 VERSION="1"
 LATEST_VERSION="1"
 
-TMPFILE=`tempfile`
+TMPFILE=`mktemp`
 
 SCHEMA_FILE="$SOURCE_DIR/v${VERSION}.sql"
 while [ -e $SCHEMA_FILE ]; do

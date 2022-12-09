@@ -1,3 +1,15 @@
+telepathy-ofono (0.3.0) bionic; urgency=medium
+
+  [ Alexander Akulich]
+  * Import mission-control plugin from telepathy-ring (the origin telepathy-ofono plugin works only with RIL modems)
+  * Normalize phone numbers on call channel creation
+  * Cleanup build system
+  
+  [Simon Schmeißer]
+  * Modernize code
+  
+ -- Simon Schmeißer <s.schmeisser@gmx.net> Sat, 13 Feb 2021 21:29 +0100
+
 telepathy-ofono (0.2+17.04.20161109-0ubuntu1) zesty; urgency=medium
 
   * Group chat fixes.
